@@ -1,0 +1,86 @@
+version: '3'
+services:
+  communication:
+    container_name: communication
+    build:
+      context: .
+      dockerfile: ./apps/communication/Dockerfile #path Dockerfile in container
+      target: development
+    command: npm run start:dev
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - adminer
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '8000:8000'
+    networks:
+      - mcrsv_network
+
+  booking-app:
+    container_name: booking-app
+    build:
+      context: .
+      dockerfile: ./apps/booking-app/Dockerfile #path Dockerfile in container
+      target: development
+    command: npm run start:dev booking-app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - adminer
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3001:3001'
+    networks:
+      - mcrsv_network
+
+  manage-reversations:
+    container_name: manage-reversations
+    build:
+      context: .
+      dockerfile: ./apps/manage-reversations/Dockerfile #path Dockerfile in container
+      target: development
+    command: npm run start:dev manage-reversations
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - adminer
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3002:3002'
+    networks:
+      - mcrsv_network
+
+  
+  db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - '5432:5432'
+    networks:
+      - mcrsv_network
+    volumes:
+      - /var/data/postgres:/data/postgres
+    environment:
+      - POSTGRES_DB=ft_db
+      - POSTGRES_USER=ft
+      - POSTGRES_PASSWORD=ft06021998
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - mcrsv_network
+networks:
+  mcrsv_network:
+    external: true
